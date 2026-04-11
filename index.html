@@ -335,22 +335,30 @@
       isRendering = true;
 
       const page = await pdfDoc.getPage(pageNumber);
-      const containerWidth = Math.max(pdfViewer.clientWidth - 40, 320);
-      const unscaledViewport = page.getViewport({ scale: 1 });
-      const deviceScale = window.devicePixelRatio || 1;
-      const scale = Math.min(
-  (containerWidth / unscaledViewport.width) * deviceScale,
-  3
-);
-      const viewport = page.getViewport({ scale });
+const containerWidth = Math.max(pdfViewer.clientWidth - 40, 320);
+const unscaledViewport = page.getViewport({ scale: 1 });
 
-      pdfCanvas.width = viewport.width;
-      pdfCanvas.height = viewport.height;
+// 顯示尺寸：控制畫面上看起來多大
+const displayScale = Math.min(containerWidth / unscaledViewport.width, 1.6);
+const viewport = page.getViewport({ scale: displayScale });
 
-      await page.render({
-        canvasContext: ctx,
-        viewport: viewport
-      }).promise;
+// 實際渲染解析度：控制清晰度
+const outputScale = window.devicePixelRatio || 1;
+
+pdfCanvas.width = Math.floor(viewport.width * outputScale);
+pdfCanvas.height = Math.floor(viewport.height * outputScale);
+
+// 這兩行很重要，讓畫面尺寸正常，但內部解析度更高
+pdfCanvas.style.width = `${viewport.width}px`;
+pdfCanvas.style.height = `${viewport.height}px`;
+
+// 重設 transform，避免重複縮放累積
+ctx.setTransform(outputScale, 0, 0, outputScale, 0, 0);
+
+await page.render({
+  canvasContext: ctx,
+  viewport: viewport
+}).promise;
 
       pageInfo.textContent = `第 ${currentPage} 頁 / ${pdfDoc.numPages} 頁`;
       pdfViewer.scrollTo({ top: 0, behavior: 'smooth' });
