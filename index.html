@@ -203,6 +203,27 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
 
+.click-zone {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 35%;
+  z-index: 20;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.click-zone.left {
+  left: 0;
+}
+
+.click-zone.right {
+  right: 0;
+}
+
+.click-zone:active {
+  background: rgba(0, 0, 0, 0.05);
+}
     .footer {
       padding: 0 0 34px;
       color: var(--muted);
@@ -317,8 +338,11 @@
       </div>
 
       <div class="pdf-frame-wrap">
-       <div class="pdfjs-viewer" id="pdfViewer">
+  <div class="pdfjs-viewer" id="pdfViewer">
   <canvas id="pdfCanvas"></canvas>
+  <div class="click-zone left" id="leftZone" aria-label="上一頁"></div>
+  <div class="click-zone right" id="rightZone" aria-label="下一頁"></div>
+</div>
 
   <!-- 左右點擊區 -->
   <div class="click-zone left"></div>
@@ -346,6 +370,8 @@
     const pdfCanvas = document.getElementById('pdfCanvas');
     const pdfViewer = document.getElementById('pdfViewer');
     const ctx = pdfCanvas.getContext('2d');
+const leftZone = document.getElementById('leftZone');
+const rightZone = document.getElementById('rightZone');
 
     let pdfDoc = null;
     let currentPage = 1;
@@ -489,6 +515,18 @@ await page.render({
         queueRenderPage(currentPage);
       }
     });
+    
+    leftZone.addEventListener('click', () => {
+  if (viewerSection.classList.contains('active')) {
+    prevPage();
+  }
+});
+
+rightZone.addEventListener('click', () => {
+  if (viewerSection.classList.contains('active')) {
+    nextPage();
+  }
+});
   </script>
 </body>
 </html>
