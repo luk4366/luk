@@ -203,27 +203,28 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
 
-.click-zone {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  width: 35%;
-  z-index: 20;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
+    .click-zone {
+      position: absolute;
+      top: 0;
+      width: 40%;
+      height: 100%;
+      z-index: 20;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-.click-zone.left {
-  left: 0;
-}
+    .click-zone.left {
+      left: 0;
+    }
 
-.click-zone.right {
-  right: 0;
-}
+    .click-zone.right {
+      right: 0;
+    }
 
-.click-zone:active {
-  background: rgba(0, 0, 0, 0.05);
-}
+    .click-zone:active {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
     .footer {
       padding: 0 0 34px;
       color: var(--muted);
@@ -247,28 +248,10 @@
         width: 100%;
         justify-content: flex-start;
       }
+      .click-zone {
+        width: 42%;
+      }
     }
-    .click-zone {
-  width: 35%;
-  position: absolute;
-  top: 0;
-  width: 50%;
-  height: 100%;
-  z-index: 20;
-}
-
-.click-zone.left {
-  left: 0;
-}
-
-.click-zone.right {
-  right: 0;
-}
-
-/* 手機點擊效果（可選） */
-.click-zone:active {
-  background: rgba(0, 0, 0, 0.05);
-}
   </style>
 </head>
 <body>
@@ -338,16 +321,11 @@
       </div>
 
       <div class="pdf-frame-wrap">
-  <div class="pdfjs-viewer" id="pdfViewer">
-  <canvas id="pdfCanvas"></canvas>
-  <div class="click-zone left" id="leftZone" aria-label="上一頁"></div>
-  <div class="click-zone right" id="rightZone" aria-label="下一頁"></div>
-</div>
-
-  <!-- 左右點擊區 -->
-  <div class="click-zone left"></div>
-  <div class="click-zone right"></div>
-</div>
+        <div class="pdfjs-viewer" id="pdfViewer">
+          <canvas id="pdfCanvas"></canvas>
+          <div class="click-zone left" id="leftZone" aria-label="上一頁"></div>
+          <div class="click-zone right" id="rightZone" aria-label="下一頁"></div>
+        </div>
       </div>
     </section>
 
@@ -370,8 +348,8 @@
     const pdfCanvas = document.getElementById('pdfCanvas');
     const pdfViewer = document.getElementById('pdfViewer');
     const ctx = pdfCanvas.getContext('2d');
-const leftZone = document.getElementById('leftZone');
-const rightZone = document.getElementById('rightZone');
+    const leftZone = document.getElementById('leftZone');
+    const rightZone = document.getElementById('rightZone');
 
     let pdfDoc = null;
     let currentPage = 1;
@@ -387,30 +365,26 @@ const rightZone = document.getElementById('rightZone');
       isRendering = true;
 
       const page = await pdfDoc.getPage(pageNumber);
-const containerWidth = Math.max(pdfViewer.clientWidth - 40, 320);
-const unscaledViewport = page.getViewport({ scale: 1 });
+      const containerWidth = Math.max(pdfViewer.clientWidth - 40, 320);
+      const unscaledViewport = page.getViewport({ scale: 1 });
 
-// 顯示尺寸：控制畫面上看起來多大
-const displayScale = Math.min(containerWidth / unscaledViewport.width, 1.6);
-const viewport = page.getViewport({ scale: displayScale });
+      const displayScale = Math.min(containerWidth / unscaledViewport.width, 2.5);
+      const viewport = page.getViewport({ scale: displayScale });
 
-// 實際渲染解析度：控制清晰度
-const outputScale = window.devicePixelRatio || 1;
+      const outputScale = window.devicePixelRatio || 1;
 
-pdfCanvas.width = Math.floor(viewport.width * outputScale);
-pdfCanvas.height = Math.floor(viewport.height * outputScale);
+      pdfCanvas.width = Math.floor(viewport.width * outputScale);
+      pdfCanvas.height = Math.floor(viewport.height * outputScale);
 
-// 這兩行很重要，讓畫面尺寸正常，但內部解析度更高
-pdfCanvas.style.width = `${viewport.width}px`;
-pdfCanvas.style.height = `${viewport.height}px`;
+      pdfCanvas.style.width = `${viewport.width}px`;
+      pdfCanvas.style.height = `${viewport.height}px`;
 
-// 重設 transform，避免重複縮放累積
-ctx.setTransform(outputScale, 0, 0, outputScale, 0, 0);
+      ctx.setTransform(outputScale, 0, 0, outputScale, 0, 0);
 
-await page.render({
-  canvasContext: ctx,
-  viewport: viewport
-}).promise;
+      await page.render({
+        canvasContext: ctx,
+        viewport: viewport
+      }).promise;
 
       pageInfo.textContent = `第 ${currentPage} 頁 / ${pdfDoc.numPages} 頁`;
       pdfViewer.scrollTo({ top: 0, behavior: 'smooth' });
@@ -515,18 +489,18 @@ await page.render({
         queueRenderPage(currentPage);
       }
     });
-    
-    leftZone.addEventListener('click', () => {
-  if (viewerSection.classList.contains('active')) {
-    prevPage();
-  }
-});
 
-rightZone.addEventListener('click', () => {
-  if (viewerSection.classList.contains('active')) {
-    nextPage();
-  }
-});
+    leftZone.addEventListener('click', () => {
+      if (viewerSection.classList.contains('active')) {
+        prevPage();
+      }
+    });
+
+    rightZone.addEventListener('click', () => {
+      if (viewerSection.classList.contains('active')) {
+        nextPage();
+      }
+    });
   </script>
 </body>
 </html>
